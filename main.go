@@ -7,8 +7,10 @@ import (
 
 func main() {
 
-
 	sourcePath := "source"
-	book := content.NewBook(sourcePath)
+	book, err := content.NewBook(sourcePath)
+	if err != nil {
+		fmt.Println("ERROR!!!")
+	}
 	fmt.Println(sourcePath, book)
 }
