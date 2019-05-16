@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+type typeResult int
+
+const (
+	md typeResult = iota
+	html
+)
+
 func parseName(path string) (num int, name string) {
 
 	_, name = filepath.Split(path)

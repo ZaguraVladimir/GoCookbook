@@ -12,7 +12,7 @@ type book struct {
 	parts map[int]fmt.Stringer
 }
 
-func NewBook(name, path string) *book {
+func newBook(name, path string) *book {
 
 	items := getItems(path)
 
@@ -26,16 +26,13 @@ func NewBook(name, path string) *book {
 
 		fullName := filepath.Join(path, fi.Name())
 		if fi.IsDir() {
-			book.parts[num] = NewChapter(fullName)
+			book.parts[num] = newChapter(fullName)
 		} else {
-			book.parts[num] = NewMDText(fullName, 2)
+			book.parts[num] = newMDText(fullName, 2)
 		}
 	}
 
 	return &book
-}
-
-func (p *book) GenerateHTML() {
 }
 
 func (p *book) String() string {

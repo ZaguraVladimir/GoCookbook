@@ -13,30 +13,22 @@ import (
 
 func main() {
 
-	//testMD()
-
 	booker := content.NewBooker()
 	if err := booker.AddBook("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\GoCookbook"); err != nil {
 		log.Fatal(err)
 	}
 
-	if n, err := booker.WriteFile("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\out.md"); err != nil {
-		log.Fatal(err)
-	} else {
-		log.Printf("%n bytes written", n)
-	}
-
-	if n, err := booker.WriteFile("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\out.html"); err != nil {
-		log.Fatal(err)
-	} else {
-		log.Printf("%n bytes written", n)
-	}
+	booker.WriteFile("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\result\\Go Cookbook.md")
+	booker.WriteFile("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\result\\Go Cookbook.html")
 }
 
 func testMD() {
 
 	data, _ := ioutil.ReadFile("in.md")
-	p := Page{"Test MarkDown", string(data)}
+	page := struct {
+		Title string
+		Body  string
+	}{"Test MarkDown", string(data)}
 
 	w, err := os.Create("out.html")
 	if err != nil {
@@ -54,14 +46,9 @@ func testMD() {
 	tmpl := template.New(tmplFileName)
 	tmpl.Funcs(template.FuncMap{"markDown": markDowner})
 	template.Must(tmpl.ParseFiles(tmplFileName))
-	if err := tmpl.ExecuteTemplate(w, tmplFileName, p); err != nil {
+	if err := tmpl.ExecuteTemplate(w, tmplFileName, page); err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Complete: ", time.Now().Format("15:04:05"))
-}
-
-type Page struct {
-	Title string
-	Body  string
 }

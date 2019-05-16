@@ -13,7 +13,7 @@ type chapter struct {
 	parts map[int]fmt.Stringer
 }
 
-func NewChapter(path string) *chapter {
+func newChapter(path string) *chapter {
 
 	items := getItems(path)
 
@@ -25,7 +25,7 @@ func NewChapter(path string) *chapter {
 		name := fi.Name()
 		fullName := filepath.Join(path, name)
 		num, _ := strconv.Atoi(name[:3])
-		chapter.parts[num] = NewSection(fullName)
+		chapter.parts[num] = newSection(fullName)
 	}
 
 	return &chapter

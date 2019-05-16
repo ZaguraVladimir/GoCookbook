@@ -13,7 +13,7 @@ type section struct {
 	parts map[int]fmt.Stringer
 }
 
-func NewSection(path string) *section {
+func newSection(path string) *section {
 
 	items := getItems(path)
 
@@ -25,7 +25,7 @@ func NewSection(path string) *section {
 		name := fi.Name()
 		fullName := filepath.Join(path, name)
 		num, _ := strconv.Atoi(name[:3])
-		section.parts[num] = NewMDText(fullName, 4)
+		section.parts[num] = newMDText(fullName, 4)
 	}
 
 	return &section

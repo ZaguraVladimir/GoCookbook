@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-type MDText string
+type mdText string
 
-func NewMDText(path string, captionLevel int) *MDText {
+func newMDText(path string, captionLevel int) *mdText {
 
-	result := MDText("")
+	result := mdText("")
 
 	if data, err := ioutil.ReadFile(path); err == nil {
 
@@ -20,11 +20,11 @@ func NewMDText(path string, captionLevel int) *MDText {
 		if len(data) != 0 {
 			text = fmt.Sprintf("%s\r\n%s", text, string(data))
 		}
-		result = MDText(text)
+		result = mdText(text)
 	}
 	return &result
 }
 
-func (t MDText) String() string {
+func (t mdText) String() string {
 	return string(t)
 }
