@@ -1,46 +1,48 @@
 package content
 
 import (
-	"os"
+	"fmt"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
+// ГЛАВА
 type chapter struct {
-	num      int
-	head     map[int]string
-	sections map[int]*section
+	name  string
+	parts map[int]fmt.Stringer
 }
 
-func NewChapter(num int, chapterPath string) *chapter {
+func NewChapter(path string) *chapter {
 
-	var chapter = chapter{num: num}
+	items := getItems(path)
 
-	chapterDir, err := os.Open(chapterPath)
-	if err != nil {
-		return nil
-	}
+	var chapter = chapter{}
+	_, chapter.name = parseName(path)
+	chapter.parts = make(map[int]fmt.Stringer, len(items))
 
-	chapterDirs, err := chapterDir.Readdir(0)
-	if err != nil {
-		return nil
-	}
-
-	// HEAD
-	//chapter.sections = make(map[int]*section, len(chapterDirs))
-	//for _, chapterDir := range chapterDirs {
-	//	sectionName := chapterDir.Name()
-	//	i, _ := strconv.Atoi(sectionName[:3])
-	//	chapter.sections[i] = NewSection(filepath.Join(chapterPath, "sections", sectionName))
-	//}
-
-	// SECTIONS
-	chapter.sections = make(map[int]*section, len(chapterDirs))
-	for _, chapterDir := range chapterDirs {
-		sectionName := chapterDir.Name()
-		num, _ := strconv.Atoi(sectionName[:3])
-		chapter.sections[num] = NewSection(num, filepath.Join(chapterPath, "sections", sectionName))
+	for _, fi := range items {
+		name := fi.Name()
+		fullName := filepath.Join(path, name)
+		num, _ := strconv.Atoi(name[:3])
+		chapter.parts[num] = NewSection(fullName)
 	}
 
 	return &chapter
+}
+
+func (p *chapter) String() string {
+
+	var b strings.Builder
+
+	b.Grow(len(p.name) + 6)
+	b.WriteString("##")
+	b.WriteString(p.name)
+
+	for i := 1; i < len(p.parts); i++ {
+		b.WriteString("\r\n")
+		b.WriteString(p.parts[i].String())
+	}
+
+	return b.String()
 }

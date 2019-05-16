@@ -15,11 +15,22 @@ func main() {
 
 	//testMD()
 
-	sourcePath := "source"
-	book := content.NewBook(sourcePath)
+	booker := content.NewBooker()
+	if err := booker.AddBook("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\GoCookbook"); err != nil {
+		log.Fatal(err)
+	}
 
-	fmt.Println(sourcePath, book)
+	if n, err := booker.WriteFile("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\out.md"); err != nil {
+		log.Fatal(err)
+	} else {
+		log.Printf("%n bytes written", n)
+	}
 
+	if n, err := booker.WriteFile("Go Cookbook", "D:\\PROG\\GoProjects\\src\\GoCookbook\\out.html"); err != nil {
+		log.Fatal(err)
+	} else {
+		log.Printf("%n bytes written", n)
+	}
 }
 
 func testMD() {

@@ -2,58 +2,33 @@ package content
 
 import (
 	"fmt"
-	"github.com/labstack/gommon/log"
-	"io/ioutil"
-	"os"
 	"path/filepath"
-	"strconv"
+	"strings"
 )
 
+// КНИГА
 type book struct {
-	countAll int
-	texts    map[int]string
-	chapters map[int]*chapter
+	name  string
+	parts map[int]fmt.Stringer
 }
 
-func NewBook(sourcePath string) *book {
+func NewBook(name, path string) *book {
+
+	items := getItems(path)
 
 	var book = book{}
+	book.name = name
+	book.parts = make(map[int]fmt.Stringer, len(items))
 
-	bookDir, err := os.Open(sourcePath)
-	if err != nil {
-		log.Fatal(err)
-	}
+	for _, fi := range items {
 
-	chapterDirs, err := bookDir.Readdir(0)
-	if err != nil {
-		log.Fatal(err)
-	}
-	book.countAll = len(chapterDirs)
+		num, _ := parseName(fi.Name())
 
-	// Посчитаем количество файлов с текстом, и каталогов с частями книги
-	countFiles, countDirs := 0, 0
-	for _, chapterDir := range chapterDirs {
-		if chapterDir.IsDir() {
-			countDirs++
+		fullName := filepath.Join(path, fi.Name())
+		if fi.IsDir() {
+			book.parts[num] = NewChapter(fullName)
 		} else {
-			countFiles++
-		}
-	}
-
-	fmt.Println(countFiles, countDirs)
-
-	book.texts = make(map[int]string, countFiles)
-	book.chapters = make(map[int]*chapter, countDirs)
-	for _, chapterDir := range chapterDirs {
-		name := chapterDir.Name()
-		fullName := filepath.Join(sourcePath, name)
-		num, _ := strconv.Atoi(name[:3])
-		if chapterDir.IsDir() {
-			book.chapters[num] = NewChapter(num, fullName)
-		} else {
-			if data, err := ioutil.ReadFile(fullName); err == nil {
-				book.texts[num] = string(data)
-			}
+			book.parts[num] = NewMDText(fullName, 2)
 		}
 	}
 
@@ -61,4 +36,20 @@ func NewBook(sourcePath string) *book {
 }
 
 func (p *book) GenerateHTML() {
+}
+
+func (p *book) String() string {
+
+	var b strings.Builder
+
+	b.Grow(len(p.name) + 1)
+	b.WriteString("#")
+	b.WriteString(p.name)
+
+	for i := 1; i < len(p.parts); i++ {
+		b.WriteString("\r\n")
+		b.WriteString(p.parts[i].String())
+	}
+
+	return b.String()
 }
